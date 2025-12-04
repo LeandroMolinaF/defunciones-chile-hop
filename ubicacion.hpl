@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pipeline>
+  <info>
+    <name>P_DIM_UBICACION</name>
+    <name_sync_with_filename>N</name_sync_with_filename>
+    <description/>
+    <extended_description/>
+    <pipeline_version/>
+    <pipeline_type>Normal</pipeline_type>
+    <pipeline_status>0</pipeline_status>
+    <parameters>
+    </parameters>
+    <capture_transform_performance>N</capture_transform_performance>
+    <transform_performance_capturing_delay>1000</transform_performance_capturing_delay>
+    <transform_performance_capturing_size_limit>100</transform_performance_capturing_size_limit>
+    <created_user>-</created_user>
+    <created_date>2025/12/03 23:07:37.956</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2025/12/03 23:07:37.956</modified_date>
+  </info>
+  <notepads>
+  </notepads>
+  <order>
+    <hop>
+      <from>Leer CSV Comunas</from>
+      <to>Seleccionar y renombrar campos</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Seleccionar y renombrar campos</from>
+      <to>Eliminar duplicados por comuna</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Eliminar duplicados por comuna</from>
+      <to>Calcular Zona</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Calcular Zona</from>
+      <to>Table output</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <transform>
+    <name>Calcular Zona</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var zona;
+
+var codRegion = parseInt( ("" + CODIGO_REGION).trim(), 10 );
+
+switch (codRegion) {
+    case 15:
+    case 1:
+    case 2:
+        zona = "Norte Grande";
+        break;
+
+    case 3:
+    case 4:
+        zona = "Norte Chico";
+        break;
+
+    case 5:
+    case 13:
+    case 6:
+    case 7:
+    case 16:
+    case 8:
+        zona = "Zona Central";
+        break;
+
+    case 9:
+    case 14:
+    case 10:
+        zona = "Zona Sur";
+        break;
+
+    case 11:
+    case 12:
+        zona = "Zona Austral";
+        break;
+
+    default:
+        zona = "Zona Desconocida";
+        break;
+}
+
+ZONA = zona;
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>ZONA</name>
+        <rename>ZONA</rename>
+        <type>String</type>
+        <length>30</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>960</xloc>
+      <yloc>128</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Eliminar duplicados por comuna</name>
+    <type>Unique</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <count_rows>N</count_rows>
+    <fields>
+      <field>
+        <case_insensitive>N</case_insensitive>
+        <name>CODIGO_COMUNA</name>
+      </field>
+    </fields>
+    <reject_duplicate_row>N</reject_duplicate_row>
+    <attributes/>
+    <GUI>
+      <xloc>704</xloc>
+      <yloc>128</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Leer CSV Comunas</name>
+    <type>TextFileInput2</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <accept_filenames>N</accept_filenames>
+    <passing_through_fields>N</passing_through_fields>
+    <accept_field/>
+    <accept_transform_name/>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar>\</escapechar>
+    <header>Y</header>
+    <prependFileName>N</prependFileName>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>mixed</format>
+    <encoding>UTF-8</encoding>
+    <length>Characters</length>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <file>
+      <name>${PROJECT_HOME}/files/input/condigo-territorial.csv</name>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+      <type>CSV</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields>
+      <field>
+        <name>codigo_comuna</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>-1</position>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>nombre_comuna</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>-1</position>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>codigo_provincia</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>-1</position>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>nombre_provincia</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>-1</position>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>codigo_region</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>-1</position>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>nombre_region</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>-1</position>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <skip_bad_files>N</skip_bad_files>
+    <file_error_field/>
+    <file_error_message_field/>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <schema_definition/>
+    <ignore_fields>N</ignore_fields>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>Y</date_format_lenient>
+    <date_format_locale>en_US</date_format_locale>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <attributes/>
+    <GUI>
+      <xloc>176</xloc>
+      <yloc>128</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Seleccionar y renombrar campos</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <length>-2</length>
+        <name>codigo_comuna</name>
+        <precision>-2</precision>
+        <rename>CODIGO_COMUNA</rename>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>nombre_comuna</name>
+        <precision>-2</precision>
+        <rename>COMUNA</rename>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>codigo_provincia</name>
+        <precision>-2</precision>
+        <rename>CODIGO_PROVINCIA</rename>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>nombre_provincia</name>
+        <precision>-2</precision>
+        <rename>PROVINCIA</rename>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>codigo_region</name>
+        <precision>-2</precision>
+        <rename>CODIGO_REGION</rename>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>nombre_region</name>
+        <precision>-2</precision>
+        <rename>REGION</rename>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>416</xloc>
+      <yloc>128</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Table output</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <add_columns>N</add_columns>
+    <always_drop_and_recreate>N</always_drop_and_recreate>
+    <auto_update_table_structure>N</auto_update_table_structure>
+    <change_column_types>N</change_column_types>
+    <commit>1000</commit>
+    <connection>INUTA</connection>
+    <drop_columns>N</drop_columns>
+    <fields>
+      <field>
+        <column_name>CODIGO_COMUNA</column_name>
+        <stream_name>CODIGO_COMUNA</stream_name>
+      </field>
+      <field>
+        <column_name>COMUNA</column_name>
+        <stream_name>COMUNA</stream_name>
+      </field>
+      <field>
+        <column_name>CODIGO_PROVINCIA</column_name>
+        <stream_name>CODIGO_PROVINCIA</stream_name>
+      </field>
+      <field>
+        <column_name>PROVINCIA</column_name>
+        <stream_name>PROVINCIA</stream_name>
+      </field>
+      <field>
+        <column_name>CODIGO_REGION</column_name>
+        <stream_name>CODIGO_REGION</stream_name>
+      </field>
+      <field>
+        <column_name>REGION</column_name>
+        <stream_name>REGION</stream_name>
+      </field>
+      <field>
+        <column_name>ZONA</column_name>
+        <stream_name>ZONA</stream_name>
+      </field>
+    </fields>
+    <ignore_errors>N</ignore_errors>
+    <only_when_have_rows>N</only_when_have_rows>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <return_keys>N</return_keys>
+    <schema>IN2025_DEFUNCIONES</schema>
+    <specify_fields>Y</specify_fields>
+    <table>DIM_UBICACION</table>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_in_table>Y</tablename_in_table>
+    <truncate>N</truncate>
+    <use_batch>Y</use_batch>
+    <attributes/>
+    <GUI>
+      <xloc>1184</xloc>
+      <yloc>128</yloc>
+    </GUI>
+  </transform>
+  <transform_error_handling>
+  </transform_error_handling>
+  <attributes/>
+</pipeline>

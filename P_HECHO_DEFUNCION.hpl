@@ -76,7 +76,12 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Filtrar sk nulos</from>
+      <from>Agregar Contador</from>
+      <to>Agrupar defunciones</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Agrupar defunciones</from>
       <to>Seleccionar columnas Hecho</to>
       <enabled>Y</enabled>
     </hop>
@@ -85,7 +90,434 @@
       <to>Insertar HECHO_DEFUNCION</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>Filtrar sk nulos</from>
+      <to>Ordenar SK</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Ordenar SK</from>
+      <to>Agregar Contador</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
+  <transform>
+    <name>Agregar Contador</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <currency/>
+        <decimal/>
+        <format/>
+        <group/>
+        <length>-1</length>
+        <name>CANT_DEFUNCIONES</name>
+        <nullif>1</nullif>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+        <type>Integer</type>
+      </field>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>288</xloc>
+      <yloc>592</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Agrupar defunciones</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <add_linenr>N</add_linenr>
+    <all_rows>N</all_rows>
+    <directory>${java.io.tmpdir}</directory>
+    <fields>
+      <field>
+        <aggregate>CANT_DEFUNCIONES</aggregate>
+        <subject>CANT_DEFUNCIONES</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+    </fields>
+    <give_back_row>N</give_back_row>
+    <group>
+      <field>
+        <name>SK_TIEMPO</name>
+      </field>
+      <field>
+        <name>SK_UBICACION</name>
+      </field>
+      <field>
+        <name>SK_SEXO</name>
+      </field>
+      <field>
+        <name>SK_EDAD</name>
+      </field>
+      <field>
+        <name>SK_LUGAR</name>
+      </field>
+      <field>
+        <name>SK_CAUSA</name>
+      </field>
+    </group>
+    <ignore_aggregate>N</ignore_aggregate>
+    <linenr_fieldname/>
+    <prefix>grp</prefix>
+    <attributes/>
+    <GUI>
+      <xloc>432</xloc>
+      <yloc>592</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Calcular edad</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var horas = 0;
+var dias = 0;
+var meses = 0;
+var anos = 0;
+var rango = null;
+
+
+var tipo = parseInt(TIPO, 10);
+var cant = parseInt(CANTIDAD, 10);
+
+if (isNaN(tipo) || isNaN(cant)) {
+  rango = "Desconocido";
+} else {
+
+  switch (tipo) {
+
+    case 4:
+      horas = cant;
+      rango = "Infancia";
+      break;
+
+    case 3:
+      dias = cant;
+      rango = "Infancia";
+      break;
+
+    case 2: // Meses
+      meses = cant;
+      rango = "Infancia";
+      break;
+
+    case 1: // Años
+      anos = cant;
+
+      if (anos &gt;= 0 &amp;&amp; anos &lt;= 5) {
+        rango = "Infancia";
+      } else if (anos >= 6 &amp;&amp; anos &lt;= 11) {
+        rango = "Niñez";
+      } else if (anos >= 12 &amp;&amp; anos &lt;= 18) {
+        rango = "Adolescencia";
+      } else if (anos >= 19 &amp;&amp; anos &lt;= 59) {
+        rango = "Adultez";
+      } else if (anos >= 60) {
+        rango = "Vejez";
+      } else {
+        rango = "Desconocido";
+      }
+      break;
+
+    default:
+      rango = "Desconocido";
+  }
+}
+
+HORAS = horas;
+DIAS = dias;
+MESES = meses;
+ANOS = anos;
+RANGO_EDAD = rango;
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>HORAS</name>
+        <rename>HORAS</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>DIAS</name>
+        <rename>DIAS</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>MESES</name>
+        <rename>MESES</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>ANOS</name>
+        <rename>ANOS</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+      <field>
+        <name>RANGO_EDAD</name>
+        <rename>RANGO_EDAD</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>688</xloc>
+      <yloc>256</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Filtrar años CIE9</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compare>
+      <condition>
+        <conditions>
+          <condition>
+            <conditions>
+</conditions>
+            <function>&gt;=</function>
+            <leftvalue>AÑO_DEFUNCION</leftvalue>
+            <negated>N</negated>
+            <operator>-</operator>
+            <value>
+              <isnull>N</isnull>
+              <length>-1</length>
+              <mask>####0;-####0</mask>
+              <name>constant</name>
+              <precision>0</precision>
+              <text>1997</text>
+              <type>Integer</type>
+            </value>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>CODIGO_CIE10</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+        </conditions>
+        <function>&gt;=</function>
+        <leftvalue>AÑO_DEFUNCION</leftvalue>
+        <negated>N</negated>
+        <operator>-</operator>
+        <value>
+          <isnull>N</isnull>
+          <length>-1</length>
+          <mask>####0;-####0</mask>
+          <name>constant</name>
+          <precision>0</precision>
+          <text>1997</text>
+          <type>Integer</type>
+        </value>
+      </condition>
+    </compare>
+    <send_true_to>Calcular edad</send_true_to>
+    <attributes/>
+    <GUI>
+      <xloc>528</xloc>
+      <yloc>256</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Filtrar sk nulos</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compare>
+      <condition>
+        <conditions>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>SK_EDAD</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>SK_TIEMPO</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>SK_UBICACION</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>SK_SEXO</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>SK_LUGAR</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+          <condition>
+            <conditions>
+</conditions>
+            <function>IS NOT NULL</function>
+            <leftvalue>SK_CAUSA</leftvalue>
+            <negated>N</negated>
+            <operator>AND</operator>
+          </condition>
+        </conditions>
+        <function>IS NOT NULL</function>
+        <leftvalue>SK_EDAD</leftvalue>
+        <negated>N</negated>
+        <operator>-</operator>
+      </condition>
+    </compare>
+    <send_true_to>Ordenar SK</send_true_to>
+    <attributes/>
+    <GUI>
+      <xloc>384</xloc>
+      <yloc>464</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Insertar HECHO_DEFUNCION</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <add_columns>N</add_columns>
+    <always_drop_and_recreate>N</always_drop_and_recreate>
+    <auto_update_table_structure>N</auto_update_table_structure>
+    <change_column_types>N</change_column_types>
+    <commit>1000</commit>
+    <connection>INUTA</connection>
+    <drop_columns>N</drop_columns>
+    <fields>
+      <field>
+        <column_name>SK_TIEMPO</column_name>
+        <stream_name>SK_TIEMPO</stream_name>
+      </field>
+      <field>
+        <column_name>SK_UBICACION</column_name>
+        <stream_name>SK_UBICACION</stream_name>
+      </field>
+      <field>
+        <column_name>SK_SEXO</column_name>
+        <stream_name>SK_SEXO</stream_name>
+      </field>
+      <field>
+        <column_name>SK_EDAD</column_name>
+        <stream_name>SK_EDAD</stream_name>
+      </field>
+      <field>
+        <column_name>SK_LUGAR</column_name>
+        <stream_name>SK_LUGAR</stream_name>
+      </field>
+      <field>
+        <column_name>SK_CAUSA</column_name>
+        <stream_name>SK_CAUSA</stream_name>
+      </field>
+      <field>
+        <column_name>CANT_DEFUNCIONES</column_name>
+        <stream_name>CANT_DEFUNCIONES</stream_name>
+      </field>
+    </fields>
+    <ignore_errors>N</ignore_errors>
+    <only_when_have_rows>N</only_when_have_rows>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <return_field/>
+    <return_keys>N</return_keys>
+    <schema>IN2025_DEFUNCIONES</schema>
+    <specify_fields>Y</specify_fields>
+    <table>HECHO_DEFUNCION</table>
+    <tablename_field/>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_in_table>Y</tablename_in_table>
+    <truncate>Y</truncate>
+    <use_batch>Y</use_batch>
+    <attributes/>
+    <GUI>
+      <xloc>912</xloc>
+      <yloc>592</yloc>
+    </GUI>
+  </transform>
   <transform>
     <name>Leer archivos DEIS</name>
     <type>TextFileInput2</type>
@@ -582,6 +1014,367 @@
     </GUI>
   </transform>
   <transform>
+    <name>Lookup DIM_CAUSA</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <connection>INUTA</connection>
+    <lookup>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <fail_on_multiple>N</fail_on_multiple>
+      <key>
+        <condition>=</condition>
+        <field>CODIGO_CIE10</field>
+        <name>CODIGO_CIE10</name>
+      </key>
+      <schema>IN2025_DEFUNCIONES</schema>
+      <table>DIM_CAUSA</table>
+      <value>
+        <name>SK_CAUSA</name>
+        <rename>SK_CAUSA</rename>
+        <trim_type>none</trim_type>
+        <type>Integer</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <GUI>
+      <xloc>512</xloc>
+      <yloc>464</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Lookup DIM_EDAD</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <connection>INUTA</connection>
+    <lookup>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <fail_on_multiple>N</fail_on_multiple>
+      <key>
+        <condition>=</condition>
+        <field>ANOS</field>
+        <name>ANOS</name>
+      </key>
+      <key>
+        <condition>=</condition>
+        <field>DIAS</field>
+        <name>DIAS</name>
+      </key>
+      <key>
+        <condition>=</condition>
+        <field>HORAS</field>
+        <name>HORAS</name>
+      </key>
+      <key>
+        <condition>=</condition>
+        <field>MESES</field>
+        <name>MESES</name>
+      </key>
+      <key>
+        <condition>=</condition>
+        <field>RANGO_EDAD</field>
+        <name>RANGO_EDAD</name>
+      </key>
+      <schema>IN2025_DEFUNCIONES</schema>
+      <table>DIM_EDAD</table>
+      <value>
+        <name>SK_EDAD</name>
+        <rename>SK_EDAD</rename>
+        <trim_type>none</trim_type>
+        <type>Integer</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <GUI>
+      <xloc>800</xloc>
+      <yloc>464</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Lookup DIM_LUGAR</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <connection>INUTA</connection>
+    <lookup>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <fail_on_multiple>N</fail_on_multiple>
+      <key>
+        <condition>=</condition>
+        <field>LUGAR</field>
+        <name>LUGAR</name>
+      </key>
+      <schema>IN2025_DEFUNCIONES</schema>
+      <table>DIM_LUGAR</table>
+      <value>
+        <name>SK_LUGAR</name>
+        <rename>SK_LUGAR</rename>
+        <trim_type>none</trim_type>
+        <type>Integer</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <GUI>
+      <xloc>656</xloc>
+      <yloc>464</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Lookup DIM_SEXO</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <connection>INUTA</connection>
+    <lookup>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <fail_on_multiple>N</fail_on_multiple>
+      <key>
+        <condition>=</condition>
+        <field>SEXO</field>
+        <name>SEXO</name>
+      </key>
+      <schema>IN2025_DEFUNCIONES</schema>
+      <table>DIM_SEXO</table>
+      <value>
+        <name>SK_SEXO</name>
+        <rename>SK_SEXO</rename>
+        <trim_type>none</trim_type>
+        <type>Integer</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <GUI>
+      <xloc>944</xloc>
+      <yloc>464</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Lookup DIM_TIEMPO</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <connection>INUTA</connection>
+    <lookup>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <fail_on_multiple>N</fail_on_multiple>
+      <key>
+        <condition>=</condition>
+        <field>FECHA</field>
+        <name>FECHA_DEFUNCION</name>
+      </key>
+      <schema>IN2025_DEFUNCIONES</schema>
+      <table>DIM_TIEMPO</table>
+      <value>
+        <name>SK_TIEMPO</name>
+        <rename>SK_TIEMPO</rename>
+        <trim_type>none</trim_type>
+        <type>Integer</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <GUI>
+      <xloc>944</xloc>
+      <yloc>256</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Lookup DIM_UBICACION</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <connection>INUTA</connection>
+    <lookup>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <fail_on_multiple>N</fail_on_multiple>
+      <key>
+        <condition>=</condition>
+        <field>CODIGO_COMUNA</field>
+        <name>CODIGO_COMUNA</name>
+      </key>
+      <schema>IN2025_DEFUNCIONES</schema>
+      <table>DIM_UBICACION</table>
+      <value>
+        <name>SK_UBICACION</name>
+        <rename>SK_UBICACION</rename>
+        <trim_type>none</trim_type>
+        <type>Integer</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <GUI>
+      <xloc>944</xloc>
+      <yloc>352</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Normalizar</name>
+    <type>StringOperations</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>CODIGO_CIE10</in_stream_name>
+        <out_stream_name/>
+        <trim_type>both</trim_type>
+        <lower_upper>upper</lower_upper>
+        <padding_type>none</padding_type>
+        <pad_char/>
+        <pad_len/>
+        <init_cap>no</init_cap>
+        <mask_xml>none</mask_xml>
+        <digits>none</digits>
+        <remove_special_characters>none</remove_special_characters>
+      </field>
+      <field>
+        <in_stream_name>LUGAR</in_stream_name>
+        <out_stream_name/>
+        <trim_type>both</trim_type>
+        <lower_upper>upper</lower_upper>
+        <padding_type>none</padding_type>
+        <pad_char/>
+        <pad_len/>
+        <init_cap>no</init_cap>
+        <mask_xml>none</mask_xml>
+        <digits>none</digits>
+        <remove_special_characters>none</remove_special_characters>
+      </field>
+      <field>
+        <in_stream_name>SEXO</in_stream_name>
+        <out_stream_name/>
+        <trim_type>both</trim_type>
+        <lower_upper>upper</lower_upper>
+        <padding_type>none</padding_type>
+        <pad_char/>
+        <pad_len/>
+        <init_cap>no</init_cap>
+        <mask_xml>none</mask_xml>
+        <digits>none</digits>
+        <remove_special_characters>none</remove_special_characters>
+      </field>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>800</xloc>
+      <yloc>256</yloc>
+    </GUI>
+  </transform>
+  <transform>
+    <name>Seleccionar columnas Hecho</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <length>-2</length>
+        <name>SK_TIEMPO</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>SK_UBICACION</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>SK_SEXO</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>SK_EDAD</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>SK_LUGAR</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>SK_CAUSA</name>
+        <precision>-2</precision>
+      </field>
+      <field>
+        <length>-2</length>
+        <name>CANT_DEFUNCIONES</name>
+        <precision>-2</precision>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <GUI>
+      <xloc>656</xloc>
+      <yloc>592</yloc>
+    </GUI>
+  </transform>
+  <transform>
     <name>Seleccionar columnas base</name>
     <type>SelectValues</type>
     <description/>
@@ -650,8 +1443,8 @@
     </GUI>
   </transform>
   <transform>
-    <name>Filtrar años CIE9</name>
-    <type>FilterRows</type>
+    <name>Ordenar SK</name>
+    <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -660,723 +1453,67 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <compare>
-      <condition>
-        <conditions>
-          <condition>
-            <conditions>
-</conditions>
-            <function>&gt;=</function>
-            <leftvalue>AÑO_DEFUNCION</leftvalue>
-            <negated>N</negated>
-            <operator>-</operator>
-            <value>
-              <isnull>N</isnull>
-              <length>-1</length>
-              <mask>####0;-####0</mask>
-              <name>constant</name>
-              <precision>0</precision>
-              <text>1997</text>
-              <type>Integer</type>
-            </value>
-          </condition>
-          <condition>
-            <conditions>
-</conditions>
-            <function>IS NOT NULL</function>
-            <leftvalue>CODIGO_CIE10</leftvalue>
-            <negated>N</negated>
-            <operator>AND</operator>
-          </condition>
-        </conditions>
-        <function>&gt;=</function>
-        <leftvalue>AÑO_DEFUNCION</leftvalue>
-        <negated>N</negated>
-        <operator>-</operator>
-        <value>
-          <isnull>N</isnull>
-          <length>-1</length>
-          <mask>####0;-####0</mask>
-          <name>constant</name>
-          <precision>0</precision>
-          <text>1997</text>
-          <type>Integer</type>
-        </value>
-      </condition>
-    </compare>
-    <send_true_to>Calcular edad</send_true_to>
-    <attributes/>
-    <GUI>
-      <xloc>528</xloc>
-      <yloc>256</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Calcular edad</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>var horas = null;
-var dias = null;
-var meses = null;
-var anos = null;
-var rango = null;
-
-
-var tipo = parseInt(TIPO, 10);
-var cant = parseInt(CANTIDAD, 10);
-
-if (isNaN(tipo) || isNaN(cant)) {
-  rango = "Desconocido";
-} else {
-
-  switch (tipo) {
-
-    case 4:
-      horas = cant;
-      rango = "Infancia";
-      break;
-
-    case 3:
-      dias = cant;
-      rango = "Infancia";
-      break;
-
-    case 2: // Meses
-      meses = cant;
-      rango = "Infancia";
-      break;
-
-    case 1: // Años
-      anos = cant;
-
-      if (anos >= 0 &amp;&amp; anos &lt;= 5) {
-        rango = "Infancia";
-      } else if (anos >= 6 &amp;&amp; anos &lt;= 11) {
-        rango = "Niñez";
-      } else if (anos >= 12 &amp;&amp; anos &lt;= 18) {
-        rango = "Adolescencia";
-      } else if (anos >= 19 &amp;&amp; anos &lt;= 59) {
-        rango = "Adultez";
-      } else if (anos >= 60) {
-        rango = "Vejez";
-      } else {
-        rango = "Desconocido";
-      }
-      break;
-
-    default:
-      rango = "Desconocido";
-  }
-}
-
-HORAS = horas;
-DIAS = dias;
-MESES = meses;
-ANOS = anos;
-RANGO_EDAD = rango;
-</jsScript_script>
-      </jsScript>
-    </jsScripts>
+    <compress>N</compress>
+    <compress_variables/>
+    <directory>${java.io.tmpdir}</directory>
     <fields>
       <field>
-        <name>HORAS</name>
-        <rename>HORAS</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>DIAS</name>
-        <rename>DIAS</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>MESES</name>
-        <rename>MESES</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>ANOS</name>
-        <rename>ANOS</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>RANGO_EDAD</name>
-        <rename>RANGO_EDAD</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-    </fields>
-    <attributes/>
-    <GUI>
-      <xloc>688</xloc>
-      <yloc>256</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Normalizar</name>
-    <type>StringOperations</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <in_stream_name>CODIGO_CIE10</in_stream_name>
-        <out_stream_name/>
-        <trim_type>both</trim_type>
-        <lower_upper>upper</lower_upper>
-        <padding_type>none</padding_type>
-        <pad_char/>
-        <pad_len/>
-        <init_cap>no</init_cap>
-        <mask_xml>none</mask_xml>
-        <digits>none</digits>
-        <remove_special_characters>none</remove_special_characters>
-      </field>
-      <field>
-        <in_stream_name>LUGAR</in_stream_name>
-        <out_stream_name/>
-        <trim_type>both</trim_type>
-        <lower_upper>upper</lower_upper>
-        <padding_type>none</padding_type>
-        <pad_char/>
-        <pad_len/>
-        <init_cap>no</init_cap>
-        <mask_xml>none</mask_xml>
-        <digits>none</digits>
-        <remove_special_characters>none</remove_special_characters>
-      </field>
-      <field>
-        <in_stream_name>SEXO</in_stream_name>
-        <out_stream_name/>
-        <trim_type>both</trim_type>
-        <lower_upper>upper</lower_upper>
-        <padding_type>none</padding_type>
-        <pad_char/>
-        <pad_len/>
-        <init_cap>no</init_cap>
-        <mask_xml>none</mask_xml>
-        <digits>none</digits>
-        <remove_special_characters>none</remove_special_characters>
-      </field>
-    </fields>
-    <attributes/>
-    <GUI>
-      <xloc>800</xloc>
-      <yloc>256</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Lookup DIM_TIEMPO</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <connection>INUTA</connection>
-    <lookup>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <fail_on_multiple>N</fail_on_multiple>
-      <key>
-        <condition>=</condition>
-        <field>FECHA</field>
-        <name>FECHA_DEFUNCION</name>
-        <name2/>
-      </key>
-      <orderby/>
-      <schema>IN2025_DEFUNCIONES</schema>
-      <table>DIM_TIEMPO</table>
-      <value>
-        <default/>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
         <name>SK_TIEMPO</name>
-        <rename>SK_TIEMPO</rename>
-        <trim_type>none</trim_type>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <GUI>
-      <xloc>944</xloc>
-      <yloc>256</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Lookup DIM_UBICACION</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <connection>INUTA</connection>
-    <lookup>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <fail_on_multiple>N</fail_on_multiple>
-      <key>
-        <condition>=</condition>
-        <field>CODIGO_COMUNA</field>
-        <name>CODIGO_COMUNA</name>
-        <name2/>
-      </key>
-      <orderby/>
-      <schema>IN2025_DEFUNCIONES</schema>
-      <table>DIM_UBICACION</table>
-      <value>
-        <default/>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
         <name>SK_UBICACION</name>
-        <rename>SK_UBICACION</rename>
-        <trim_type>none</trim_type>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <GUI>
-      <xloc>944</xloc>
-      <yloc>400</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Lookup DIM_SEXO</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <connection>INUTA</connection>
-    <lookup>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <fail_on_multiple>N</fail_on_multiple>
-      <key>
-        <condition>=</condition>
-        <field>SEXO</field>
-        <name>SEXO</name>
-        <name2/>
-      </key>
-      <orderby/>
-      <schema>IN2025_DEFUNCIONES</schema>
-      <table>DIM_SEXO</table>
-      <value>
-        <default/>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
         <name>SK_SEXO</name>
-        <rename>SK_SEXO</rename>
-        <trim_type>none</trim_type>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <GUI>
-      <xloc>944</xloc>
-      <yloc>528</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Lookup DIM_EDAD</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <connection>INUTA</connection>
-    <lookup>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <fail_on_multiple>N</fail_on_multiple>
-      <key>
-        <condition>=</condition>
-        <field>HORAS</field>
-        <name>HORAS</name>
-        <name2/>
-      </key>
-      <key>
-        <condition>=</condition>
-        <field>DIAS</field>
-        <name>DIAS</name>
-        <name2/>
-      </key>
-      <key>
-        <condition>=</condition>
-        <field>MESES</field>
-        <name>MESES</name>
-        <name2/>
-      </key>
-      <key>
-        <condition>=</condition>
-        <field>ANOS</field>
-        <name>ANOS</name>
-        <name2/>
-      </key>
-      <key>
-        <condition>=</condition>
-        <field>RANGO_EDAD</field>
-        <name>RANGO_EDAD</name>
-        <name2/>
-      </key>
-      <orderby/>
-      <schema>IN2025_DEFUNCIONES</schema>
-      <table>DIM_EDAD</table>
-      <value>
-        <default/>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
         <name>SK_EDAD</name>
-        <rename>SK_EDAD</rename>
-        <trim_type>none</trim_type>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <GUI>
-      <xloc>800</xloc>
-      <yloc>528</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Lookup DIM_LUGAR</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <connection>INUTA</connection>
-    <lookup>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <fail_on_multiple>N</fail_on_multiple>
-      <key>
-        <condition>=</condition>
-        <field>LUGAR</field>
-        <name>LUGAR</name>
-        <name2/>
-      </key>
-      <orderby/>
-      <schema>IN2025_DEFUNCIONES</schema>
-      <table>DIM_LUGAR</table>
-      <value>
-        <default/>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
         <name>SK_LUGAR</name>
-        <rename>SK_LUGAR</rename>
-        <trim_type>none</trim_type>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <GUI>
-      <xloc>640</xloc>
-      <yloc>528</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Lookup DIM_CAUSA</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <cache>N</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <connection>INUTA</connection>
-    <lookup>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <fail_on_multiple>N</fail_on_multiple>
-      <key>
-        <condition>=</condition>
-        <field>CODIGO_CIE10</field>
-        <name>CODIGO_CIE10</name>
-        <name2/>
-      </key>
-      <orderby/>
-      <schema>IN2025_DEFUNCIONES</schema>
-      <table>DIM_CAUSA</table>
-      <value>
-        <default/>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
         <name>SK_CAUSA</name>
-        <rename>SK_CAUSA</rename>
-        <trim_type>none</trim_type>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <GUI>
-      <xloc>480</xloc>
-      <yloc>528</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Filtrar sk nulos</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compare>
-      <condition>
-        <conditions>
-          <condition>
-            <conditions>
-</conditions>
-            <function>IS NOT NULL</function>
-            <leftvalue>SK_TIEMPO</leftvalue>
-            <negated>N</negated>
-            <operator>-</operator>
-          </condition>
-          <condition>
-            <conditions>
-              <condition>
-                <conditions>
-</conditions>
-                <function>IS NOT NULL</function>
-                <leftvalue>SK_UBICACION</leftvalue>
-                <negated>N</negated>
-                <operator>AND</operator>
-              </condition>
-              <condition>
-                <conditions>
-</conditions>
-                <function>IS NOT NULL</function>
-                <leftvalue>SK_SEXO</leftvalue>
-                <negated>N</negated>
-                <operator>AND</operator>
-              </condition>
-              <condition>
-                <conditions>
-</conditions>
-                <function>IS NOT NULL</function>
-                <leftvalue>SK_EDAD</leftvalue>
-                <negated>N</negated>
-                <operator>AND</operator>
-              </condition>
-              <condition>
-                <conditions>
-                  <condition>
-                    <conditions>
-</conditions>
-                    <function>IS NOT NULL</function>
-                    <leftvalue>SK_LUGAR</leftvalue>
-                    <negated>N</negated>
-                    <operator>AND</operator>
-                  </condition>
-                  <condition>
-                    <conditions>
-</conditions>
-                    <function>IS NOT NULL</function>
-                    <leftvalue>SK_CAUSA</leftvalue>
-                    <negated>N</negated>
-                    <operator>AND</operator>
-                  </condition>
-                </conditions>
-                <function>IS NOT NULL</function>
-                <leftvalue>SK_LUGAR</leftvalue>
-                <negated>N</negated>
-                <operator>AND</operator>
-              </condition>
-            </conditions>
-            <function>IS NOT NULL</function>
-            <leftvalue>SK_UBICACION</leftvalue>
-            <negated>N</negated>
-            <operator>AND</operator>
-          </condition>
-        </conditions>
-        <function>IS NOT NULL</function>
-        <leftvalue>SK_TIEMPO</leftvalue>
-        <negated>N</negated>
-        <operator>-</operator>
-      </condition>
-    </compare>
-    <send_true_to>Seleccionar columnas Hecho</send_true_to>
-    <attributes/>
-    <GUI>
-      <xloc>352</xloc>
-      <yloc>528</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Seleccionar columnas Hecho</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <length>-2</length>
-        <name>SK_TIEMPO</name>
-        <precision>-2</precision>
-        <rename/>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>SK_UBICACION</name>
-        <precision>-2</precision>
-        <rename/>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>SK_SEXO</name>
-        <precision>-2</precision>
-        <rename/>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>SK_EDAD</name>
-        <precision>-2</precision>
-        <rename/>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>SK_LUGAR</name>
-        <precision>-2</precision>
-        <rename/>
-      </field>
-      <field>
-        <length>-2</length>
-        <name>SK_CAUSA</name>
-        <precision>-2</precision>
-        <rename/>
-      </field>
-      <select_unspecified>N</select_unspecified>
-    </fields>
-    <attributes/>
-    <GUI>
-      <xloc>192</xloc>
-      <yloc>528</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Insertar HECHO_DEFUNCION</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <add_columns>N</add_columns>
-    <always_drop_and_recreate>N</always_drop_and_recreate>
-    <auto_update_table_structure>N</auto_update_table_structure>
-    <change_column_types>N</change_column_types>
-    <commit>10000</commit>
-    <connection>INUTA</connection>
-    <drop_columns>N</drop_columns>
-    <fields>
-      <field>
-        <column_name>SK_TIEMPO</column_name>
-        <stream_name>SK_TIEMPO</stream_name>
-      </field>
-      <field>
-        <column_name>SK_UBICACION</column_name>
-        <stream_name>SK_UBICACION</stream_name>
-      </field>
-      <field>
-        <column_name>SK_SEXO</column_name>
-        <stream_name>SK_SEXO</stream_name>
-      </field>
-      <field>
-        <column_name>SK_EDAD</column_name>
-        <stream_name>SK_EDAD</stream_name>
-      </field>
-      <field>
-        <column_name>SK_LUGAR</column_name>
-        <stream_name>SK_LUGAR</stream_name>
-      </field>
-      <field>
-        <column_name>SK_CAUSA</column_name>
-        <stream_name>SK_CAUSA</stream_name>
+        <presorted>N</presorted>
       </field>
     </fields>
-    <ignore_errors>N</ignore_errors>
-    <only_when_have_rows>N</only_when_have_rows>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <return_field/>
-    <return_keys>N</return_keys>
-    <schema>IN2025_DEFUNCIONES</schema>
-    <specify_fields>Y</specify_fields>
-    <table>HECHO_DEFUNCION</table>
-    <tablename_field/>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_in_table>Y</tablename_in_table>
-    <truncate>N</truncate>
-    <use_batch>Y</use_batch>
+    <free_memory/>
+    <sort_prefix>out</sort_prefix>
+    <sort_size>500000</sort_size>
+    <unique_rows>N</unique_rows>
     <attributes/>
     <GUI>
-      <xloc>192</xloc>
-      <yloc>672</yloc>
+      <xloc>256</xloc>
+      <yloc>464</yloc>
     </GUI>
   </transform>
   <transform_error_handling>

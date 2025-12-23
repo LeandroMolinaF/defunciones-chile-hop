@@ -114,10 +114,6 @@
     </partitioning>
     <fields>
       <field>
-        <currency/>
-        <decimal/>
-        <format/>
-        <group/>
         <length>-1</length>
         <name>CANT_DEFUNCIONES</name>
         <nullif>1</nullif>
@@ -128,7 +124,7 @@
     </fields>
     <attributes/>
     <GUI>
-      <xloc>288</xloc>
+      <xloc>240</xloc>
       <yloc>592</yloc>
     </GUI>
   </transform>
@@ -151,7 +147,6 @@
         <aggregate>CANT_DEFUNCIONES</aggregate>
         <subject>CANT_DEFUNCIONES</subject>
         <type>SUM</type>
-        <valuefield/>
       </field>
     </fields>
     <give_back_row>N</give_back_row>
@@ -176,11 +171,10 @@
       </field>
     </group>
     <ignore_aggregate>N</ignore_aggregate>
-    <linenr_fieldname/>
     <prefix>grp</prefix>
     <attributes/>
     <GUI>
-      <xloc>432</xloc>
+      <xloc>416</xloc>
       <yloc>592</yloc>
     </GUI>
   </transform>
@@ -500,21 +494,18 @@ RANGO_EDAD = rango;
     <only_when_have_rows>N</only_when_have_rows>
     <partitioning_daily>N</partitioning_daily>
     <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
     <partitioning_monthly>Y</partitioning_monthly>
-    <return_field/>
     <return_keys>N</return_keys>
     <schema>IN2025_DEFUNCIONES</schema>
     <specify_fields>Y</specify_fields>
     <table>HECHO_DEFUNCION</table>
-    <tablename_field/>
     <tablename_in_field>N</tablename_in_field>
     <tablename_in_table>Y</tablename_in_table>
-    <truncate>Y</truncate>
+    <truncate>N</truncate>
     <use_batch>Y</use_batch>
     <attributes/>
     <GUI>
-      <xloc>912</xloc>
+      <xloc>896</xloc>
       <yloc>592</yloc>
     </GUI>
   </transform>
@@ -558,12 +549,7 @@ RANGO_EDAD = rango;
     <length>Characters</length>
     <add_to_result_filenames>Y</add_to_result_filenames>
     <file>
-      <name>${PROJECT_HOME}/files/input/DEFUNCIONES_1990_2022.csv</name>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-      <name>${PROJECT_HOME}/files/input/DEFUNCIONES_2023_2025_18112025.csv</name>
+      <name>${PROJECT_HOME}/files/input/defunciones_parte_2.csv</name>
       <filemask/>
       <exclude_filemask/>
       <file_required>N</file_required>
@@ -1320,6 +1306,78 @@ RANGO_EDAD = rango;
     </GUI>
   </transform>
   <transform>
+    <name>Ordenar SK</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compress>N</compress>
+    <directory>${java.io.tmpdir}</directory>
+    <fields>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <name>SK_TIEMPO</name>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <name>SK_UBICACION</name>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <name>SK_SEXO</name>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <name>SK_EDAD</name>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <name>SK_LUGAR</name>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <name>SK_CAUSA</name>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <sort_prefix>out</sort_prefix>
+    <sort_size>500000</sort_size>
+    <unique_rows>N</unique_rows>
+    <attributes/>
+    <GUI>
+      <xloc>240</xloc>
+      <yloc>464</yloc>
+    </GUI>
+  </transform>
+  <transform>
     <name>Seleccionar columnas Hecho</name>
     <type>SelectValues</type>
     <description/>
@@ -1440,80 +1498,6 @@ RANGO_EDAD = rango;
     <GUI>
       <xloc>352</xloc>
       <yloc>256</yloc>
-    </GUI>
-  </transform>
-  <transform>
-    <name>Ordenar SK</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compress>N</compress>
-    <compress_variables/>
-    <directory>${java.io.tmpdir}</directory>
-    <fields>
-      <field>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <name>SK_TIEMPO</name>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <name>SK_UBICACION</name>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <name>SK_SEXO</name>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <name>SK_EDAD</name>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <name>SK_LUGAR</name>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <name>SK_CAUSA</name>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-    <free_memory/>
-    <sort_prefix>out</sort_prefix>
-    <sort_size>500000</sort_size>
-    <unique_rows>N</unique_rows>
-    <attributes/>
-    <GUI>
-      <xloc>256</xloc>
-      <yloc>464</yloc>
     </GUI>
   </transform>
   <transform_error_handling>
